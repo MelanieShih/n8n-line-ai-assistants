@@ -9,7 +9,7 @@
 ### 1. [LINE × Google Calendar 智慧行事曆助理](./line_calendar_agent/)
 整合 LINE Messaging API 與 Google Calendar API，能理解自然語言並自動執行建立、查詢、修改與刪除行程的 AI 代理人。
 
-### 2. [自動化 AI 客服知識庫系統 (RAG)](./line_rag_customer_service/)
+### 2. [自動化 AI 客服知識庫系統 (RAG)](./line_RAG_agent/)
 結合 Qdrant 向量資料庫與 n8n，能夠自動切片 PDF 技術文件並進行語意檢索，提供精準問答並具備防幻覺機制的 LINE 客服機器人。
 
 ## 🛠️ 技術堆疊
