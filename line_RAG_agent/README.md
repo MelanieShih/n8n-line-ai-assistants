@@ -21,7 +21,7 @@
 3. 設定 HuggingFace Token (用於 Embedding) 與 Groq API Key (用於生成回答)[cite: 3]。
 4. 將 Qdrant 連線 URL 設定為 `http://qdrant:6333`[cite: 3]。
 
-## 👨‍💻 Author
+## Author
 **施孟伶 (Meng-Ling Shih)**
 國立臺北科技大學 工業工程與管理研究所 (M.S. in Industrial Engineering and Management, NTUT)
 具備精實管理 (Lean Management) 與資料科學分析背景，擅長透過 Python 與 n8n 整合企業 AI 應用解決方案。
