@@ -7,7 +7,7 @@
 *(點擊上方圖片觀看 Demo 影片)*
 
 ## 🏗️ 系統架構與工作流
-<img width="594" height="199" alt="Calendar_workflow" src="https://github.com/user-attachments/assets/55888019-e538-421a-a8fb-6165d7fdb4bd" />
+<img width="945" height="293" alt="Calendar_workflow" src="https://github.com/user-attachments/assets/ba7e1933-1b11-45a3-9203-545bbdf82fe8" />
 
 
 ## 🛠️ 技術架構
