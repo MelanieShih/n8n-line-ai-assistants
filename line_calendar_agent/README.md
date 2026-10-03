@@ -19,7 +19,7 @@
 1. 建立 `docker-compose.yml` 啟動 n8n 容器。
 2. 於 GCP 申請 Google Calendar API 的 OAuth 2.0 憑證，並於 n8n 中綁定[cite: 4]。
 3. 於 LINE Developers 建立官方帳號，獲取 Channel Secret 與 Access Token[cite: 4]。
-4. 匯入 `line_calender_new.json`，並將佔位符替換為您的 API Keys。
+4. 匯入 `line_calendar_agent.json`，並將佔位符替換為您的 API Keys。
 
 ## 👨‍‍💻 Author
 **施孟伶 (Meng-Ling Shih)**
