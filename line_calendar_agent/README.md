@@ -2,6 +2,14 @@
 
 透過 n8n 打造結合 LINE Messaging API 與 Google Calendar 的自動化 AI 助理，能理解自然語言並自動執行行事曆的管理任務。
 
+## 🎥 Demo 展示
+[![行事曆助理 Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)]([https://www.youtube.com/watch?v=YOUR_VIDEO_ID](https://youtube.com/shorts/uBPsTAJVkmQ?feature=share))
+*(點擊上方圖片觀看 Demo 影片)*
+
+## 🏗️ 系統架構與工作流
+<img width="594" height="199" alt="Calendar_workflow" src="https://github.com/user-attachments/assets/55888019-e538-421a-a8fb-6165d7fdb4bd" />
+
+
 ## 🛠️ 技術架構
 * **自動化工作流**：n8n (自託管 Docker 環境)
 * **LLM 模型**：Groq API (`llama-3.3-70b-versatile`)[cite: 1]
