@@ -1,0 +1,695 @@
+{
+"name": "Line客服知識庫\_完整版",
+"nodes": \[
+{
+"parameters": {
+"options": {
+"systemMessage": "=你是一個資料檢索的幫手，會有三個pdf檔案，檔案內容為用戶用電設備裝置規則、電氣設備知識以及台電公司營業規則。\\n回答規則：\\n1. 所有問題的回覆都需要由檔案查找答案。\\n2. 你必須使用檢索工具的結果來回答，不能忽略它。\\n3. 如果工具返回了答案，就直接用該答案，不要再次嘗試檢索。\\n4. 如果工具返回空白，請回覆「文件中未提及」。\\n5. 不要為了尋找更多細節而再次呼叫工具或重複檢索。\\n6. 回答必須簡潔，避免進入無限迴圈。\\n7. 一定要回答，沒有答案就回答統一回答：「很抱歉，目前無法解答。如果需要，請聯絡真人客服。」。\\n8.一律使用純文字回答，不要使用任何Markdown標記或星號。\\n9.若從文件中讀到有 、\*、\_ 等符號，請在回覆前先移除，只保留內容文字。"
+}
+},
+"type": "@n8n/n8n-nodes-langchain.agent",
+"typeVersion": 2.2,
+"position": \[
+\-32,
+192
+\],
+"id": "d0cedc6f-4d0f-4b5b-b591-7ff5c87dc5bf",
+"name": "AI Agent",
+"onError": "continueErrorOutput"
+},
+{
+"parameters": {},
+"type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+"typeVersion": 1.3,
+"position": \[
+\-64,
+464
+\],
+"id": "2ffec03e-d047-4896-8b91-9c18d74dcbac",
+"name": "Simple Memory"
+},
+{
+"parameters": {
+"assignments": {
+"assignments": \[
+{
+"id": "7f0162d5-d825-4ec2-adfd-8eb0ee62d380",
+"name": "chatInput",
+"value": "={{ \$('LINE-API-Filter').item.json.chatInput }}",
+"type": "string"
+},
+{
+"id": "3810600e-0311-49a3-939a-a71c0d1a70bb",
+"name": "process",
+"value": "=LINE",
+"type": "string"
+}
+\]
+},
+"includeOtherFields": true,
+"options": {}
+},
+"type": "n8n-nodes-base.set",
+"typeVersion": 3.4,
+"position": \[
+\-272,
+192
+\],
+"id": "0af20c98-083d-4ab4-83af-ec1ae5db8b23",
+"name": "ProcessFilter"
+},
+{
+"parameters": {
+"assignments": {
+"assignments": \[
+{
+"id": "a6320f60-3f44-4d6e-b116-be38085964d7",
+"name": "chatInput",
+"value": "={{ \$json.body.events\[0\].message.text }}",
+"type": "string"
+},
+{
+"id": "d4630b70-ef3e-41a6-a74c-c28af4e57bda",
+"name": "sessionId",
+"value": "={{ \$json.body.events\[0\].replyToken }}",
+"type": "string"
+},
+{
+"id": "a2f6ec0a-ff01-420b-bf66-db20025e9588",
+"name": "replyToken",
+"value": "={{ \$json.body.events\[0\].replyToken }}",
+"type": "string"
+},
+{
+"id": "ed2bba82-98ca-49ab-b58e-2b7d141999c3",
+"name": "\$vars.process",
+"value": "LINE",
+"type": "string"
+}
+\]
+},
+"includeOtherFields": true,
+"options": {}
+},
+"type": "n8n-nodes-base.set",
+"typeVersion": 3.4,
+"position": \[
+\-640,
+208
+\],
+"id": "cdd4d35a-a093-4da5-81c9-d41ac607facb",
+"name": "LINE-API-Filter"
+},
+{
+"parameters": {
+"conditions": {
+"options": {
+"caseSensitive": true,
+"leftValue": "",
+"typeValidation": "strict",
+"version": 2
+},
+"conditions": \[
+{
+"id": "b90c82c4-b063-4663-817b-68d2ec51cfa5",
+"leftValue": "={{ \$json.chatInput }}",
+"rightValue": "",
+"operator": {
+"type": "string",
+"operation": "notEmpty",
+"singleValue": true
+}
+}
+\],
+"combinator": "and"
+},
+"options": {}
+},
+"type": "n8n-nodes-base.if",
+"typeVersion": 2.2,
+"position": \[
+\-480,
+208
+\],
+"id": "252b354e-dd15-46d5-9ec9-0c5de79d8667",
+"name": "If"
+},
+{
+"parameters": {
+"httpMethod": "POST",
+"path": "RAG_robot",
+"responseMode": "responseNode",
+"options": {}
+},
+"id": "ac0ac1e8-7445-40fd-b9c5-db35ce46f8de",
+"name": "LineWebhook",
+"type": "n8n-nodes-base.webhook",
+"typeVersion": 2,
+"position": \[
+\-816,
+208
+\],
+"webhookId": "<YOUR_WEBHOOK_ID_1>"
+},
+{
+"parameters": {
+"assignments": {
+"assignments": \[
+{
+"id": "b951b0b9-8c01-4b78-a4de-7a2b1e56c534",
+"name": "text",
+"value": "={{ \$json.output.replace(/\\n/g, '\\\\n') }}",
+"type": "string"
+},
+{
+"id": "06a6a561-2339-46fa-b0cd-8d8c11783873",
+"name": "replyToken",
+"value": "={{ \$('LineWebhook').item.json.body.events\[0\].replyToken }}",
+"type": "string"
+}
+\]
+},
+"options": {}
+},
+"type": "n8n-nodes-base.set",
+"typeVersion": 3.4,
+"position": \[
+352,
+192
+\],
+"id": "de1cab56-e97d-426a-903a-cf682d1bc94c",
+"name": "AI-Message-Filter"
+},
+{
+"parameters": {
+"respondWith": "json",
+"responseBody": "{\\n  "status": "ok"\\n}\\n",
+"options": {}
+},
+"id": "6525145f-f4ad-406e-a1e1-8abd1db2b29d",
+"name": "Respond to LineWebhook",
+"type": "n8n-nodes-base.respondToWebhook",
+"typeVersion": 1.1,
+"position": \[
+688,
+192
+\]
+},
+{
+"parameters": {
+"assignments": {
+"assignments": \[
+{
+"id": "52cad0b3-481a-4ca0-8ec4-ecb07e95b047",
+"name": "message",
+"value": "很抱歉，目前找不到相關資訊，請聯絡真人客服！",
+"type": "string"
+}
+\]
+},
+"options": {}
+},
+"type": "n8n-nodes-base.set",
+"typeVersion": 3.4,
+"position": \[
+352,
+384
+\],
+"id": "b8acbcc8-adee-4b23-b54d-4b2bb9dc3705",
+"name": "Edit Fields"
+},
+{
+"parameters": {
+"respondWith": "json",
+"responseBody": "{\\n  "status": "ok"\\n}\\n",
+"options": {}
+},
+"id": "ef064a7f-2426-46a2-849d-c01dd03cda2c",
+"name": "Respond to LineWebhook1",
+"type": "n8n-nodes-base.respondToWebhook",
+"typeVersion": 1.1,
+"position": \[
+704,
+384
+\]
+},
+{
+"parameters": {
+"chunkOverlap": 100,
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+"typeVersion": 1,
+"position": \[
+\-608,
+752
+\],
+"id": "556fd172-2d5c-45d5-a6f5-3ede48db856d",
+"name": "Recursive Character Text Splitter"
+},
+{
+"parameters": {
+"dataType": "binary",
+"textSplittingMode": "custom",
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+"typeVersion": 1.1,
+"position": \[
+\-608,
+592
+\],
+"id": "4b0e6621-b812-4b36-878a-397ca8db1663",
+"name": "Default Data Loader1"
+},
+{
+"parameters": {
+"formTitle": "Upload  data to  RAG",
+"formFields": {
+"values": \[
+{
+"fieldLabel": "inputFile",
+"fieldType": "file",
+"requiredField": true
+}
+\]
+},
+"options": {}
+},
+"type": "n8n-nodes-base.formTrigger",
+"typeVersion": 2.3,
+"position": \[
+\-816,
+384
+\],
+"id": "6d62367c-804f-4d08-8d71-b51bad282ec0",
+"name": "On form submission1",
+"webhookId": "<YOUR_WEBHOOK_ID_2>"
+},
+{
+"parameters": {
+"modelName": "intfloat/multilingual-e5-base",
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+"typeVersion": 1,
+"position": \[
+\-736,
+592
+\],
+"id": "b53e61f4-6c6d-4df8-bb4a-d1ae37b53b20",
+"name": "Embeddings HuggingFace Inference1",
+"credentials": {
+"huggingFaceApi": {
+"id": "Rns4q9E8qXzpCqUe",
+"name": "HuggingFaceApi account"
+}
+}
+},
+{
+"parameters": {
+"model": "qwen/qwen3-32b",
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+"typeVersion": 1,
+"position": \[
+\-224,
+464
+\],
+"id": "19b44500-906f-4bfa-8fe6-958de2a5debc",
+"name": "Groq Chat Model",
+"credentials": {
+"groqApi": {
+"id": "D8OaDSh3ECbI59Wc",
+"name": "Groq account"
+}
+}
+},
+{
+"parameters": {
+"mode": "retrieve-as-tool",
+"toolDescription": "answer question with data",
+"qdrantCollection": {
+"\__rl": true,
+"value": "電力資料",
+"mode": "list",
+"cachedResultName": "電力資料"
+},
+"topK": 3,
+"includeDocumentMetadata": false,
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+"typeVersion": 1.3,
+"position": \[
+80,
+448
+\],
+"id": "188d3ada-9fae-4a95-b59e-52cb19c860ad",
+"name": "Qdrant Vector Store",
+"credentials": {
+"qdrantApi": {
+"id": "4oxiCR3QRL9fqOuy",
+"name": "QdrantApi account"
+}
+}
+},
+{
+"parameters": {
+"modelName": "intfloat/multilingual-e5-base",
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+"typeVersion": 1,
+"position": \[
+80,
+624
+\],
+"id": "1d69db3a-e836-4c54-a65b-518c3d529082",
+"name": "Embeddings HuggingFace Inference",
+"credentials": {
+"huggingFaceApi": {
+"id": "Rns4q9E8qXzpCqUe",
+"name": "HuggingFaceApi account"
+}
+}
+},
+{
+"parameters": {
+"method": "POST",
+"url": "https://api.line.me/v2/bot/message/reply",
+"authentication": "genericCredentialType",
+"genericAuthType": "httpBearerAuth",
+"sendHeaders": true,
+"headerParameters": {
+"parameters": \[
+{
+"name": "Content-Type",
+"value": "application/json"
+},
+{
+"name": "Authorization",
+"value": "Bearer <YOUR_LINE_CHANNEL_ACCESS_TOKEN>"
+}
+\]
+},
+"sendBody": true,
+"specifyBody": "json",
+"jsonBody": "={\\n  "replyToken": "{{ \$json.replyToken }}",\\n  "messages": \[\\n    {\\n      "type": "text",\\n      "text": "{{ $json.text.replace(/\\n/g, '\\\\n').replace(/\\"/g, '\\\\"') }}"\\n    }\\n  \]\\n}",
+"options": {}
+},
+"type": "n8n-nodes-base.httpRequest",
+"typeVersion": 4.2,
+"position": \[
+528,
+192
+\],
+"id": "43d829bb-f762-4c5a-a0d5-56436a90f255",
+"name": "HTTP Request2",
+"credentials": {
+"httpBearerAuth": {
+"id": "Jumfu0rbj5zFGKCd",
+"name": "Bearer Auth account"
+}
+}
+},
+{
+"parameters": {
+"method": "POST",
+"url": "https://api.line.me/v2/bot/message/reply",
+"authentication": "genericCredentialType",
+"genericAuthType": "httpBearerAuth",
+"sendHeaders": true,
+"headerParameters": {
+"parameters": \[
+{
+"name": "Content-Type",
+"value": "application/json"
+},
+{
+"name": "Authorization",
+"value": "Bearer <YOUR_LINE_CHANNEL_ACCESS_TOKEN>"
+}
+\]
+},
+"sendBody": true,
+"specifyBody": "json",
+"jsonBody": "={\\n  "replyToken": "{{ \$json.replyToken }}",\\n  "messages": \[\\n    {\\n      "type": "text",\\n      "text": "{{ $json.message }}"\\n    }\\n  \]\\n}",
+"options": {}
+},
+"type": "n8n-nodes-base.httpRequest",
+"typeVersion": 4.2,
+"position": \[
+544,
+384
+\],
+"id": "0167f29b-b252-48f7-9a95-e7eaa41f0b2e",
+"name": "HTTP Request",
+"credentials": {
+"httpBearerAuth": {
+"id": "Jumfu0rbj5zFGKCd",
+"name": "Bearer Auth account"
+}
+}
+},
+{
+"parameters": {
+"mode": "insert",
+"qdrantCollection": {
+"\__rl": true,
+"value": "=電力資料\_2",
+"mode": "id"
+},
+"options": {}
+},
+"type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+"typeVersion": 1.3,
+"position": \[
+\-624,
+384
+\],
+"id": "f9bd0d6b-2e20-4e0c-9a9b-1c2fb558188c",
+"name": "檔案資料庫",
+"credentials": {
+"qdrantApi": {
+"id": "4oxiCR3QRL9fqOuy",
+"name": "QdrantApi account"
+}
+}
+}
+\],
+"pinData": {},
+"connections": {
+"Simple Memory": {
+"ai_memory": \[
+\[
+{
+"node": "AI Agent",
+"type": "ai_memory",
+"index": 0
+}
+\]
+\]
+},
+"LINE-API-Filter": {
+"main": \[
+\[
+{
+"node": "If",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"If": {
+"main": \[
+\[
+{
+"node": "ProcessFilter",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"LineWebhook": {
+"main": \[
+\[
+{
+"node": "LINE-API-Filter",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"ProcessFilter": {
+"main": \[
+\[
+{
+"node": "AI Agent",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"AI-Message-Filter": {
+"main": \[
+\[
+{
+"node": "HTTP Request2",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"AI Agent": {
+"main": \[
+\[
+{
+"node": "AI-Message-Filter",
+"type": "main",
+"index": 0
+}
+\],
+\[
+{
+"node": "Edit Fields",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"Edit Fields": {
+"main": \[
+\[
+{
+"node": "HTTP Request",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"Recursive Character Text Splitter": {
+"ai_textSplitter": \[
+\[
+{
+"node": "Default Data Loader1",
+"type": "ai_textSplitter",
+"index": 0
+}
+\]
+\]
+},
+"Default Data Loader1": {
+"ai_document": \[
+\[
+{
+"node": "檔案資料庫",
+"type": "ai_document",
+"index": 0
+}
+\]
+\]
+},
+"On form submission1": {
+"main": \[
+\[
+{
+"node": "檔案資料庫",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"Embeddings HuggingFace Inference1": {
+"ai_embedding": \[
+\[
+{
+"node": "檔案資料庫",
+"type": "ai_embedding",
+"index": 0
+}
+\]
+\]
+},
+"Groq Chat Model": {
+"ai_languageModel": \[
+\[
+{
+"node": "AI Agent",
+"type": "ai_languageModel",
+"index": 0
+}
+\]
+\]
+},
+"Qdrant Vector Store": {
+"ai_tool": \[
+\[
+{
+"node": "AI Agent",
+"type": "ai_tool",
+"index": 0
+}
+\]
+\]
+},
+"Embeddings HuggingFace Inference": {
+"ai_embedding": \[
+\[
+{
+"node": "Qdrant Vector Store",
+"type": "ai_embedding",
+"index": 0
+}
+\]
+\]
+},
+"HTTP Request2": {
+"main": \[
+\[
+{
+"node": "Respond to LineWebhook",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"HTTP Request": {
+"main": \[
+\[
+{
+"node": "Respond to LineWebhook1",
+"type": "main",
+"index": 0
+}
+\]
+\]
+},
+"Respond to LineWebhook": {
+"main": \[
+\[\]
+\]
+}
+},
+"active": true,
+"settings": {
+"executionOrder": "v1"
+},
+"versionId": "1c4e418f-0d8c-47f8-8362-7cf4f353da54",
+"meta": {
+"templateCredsSetupCompleted": true,
+"instanceId": "b49e802f2a9ede80a301636c12beefc10e75cf93ce136080d5dd42a8984950d8"
+},
+"id": "s0llTwj6KSYEIaVg",
+"tags": \[\]
+}
