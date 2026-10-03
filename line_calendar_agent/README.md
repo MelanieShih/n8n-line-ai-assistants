@@ -9,12 +9,18 @@
 ## 🏗️ 系統架構與工作流
 <img width="945" height="293" alt="Calendar_workflow" src="https://github.com/user-attachments/assets/ba7e1933-1b11-45a3-9203-545bbdf82fe8" />
 
+系統運作流程：
+1. **接收訊息**：透過 LINE Webhook 接收用戶的自然語言指令。
+2. **資料處理**：擷取 `message.text` 與 `replyToken`，並過濾非文字訊息。
+3. **AI 推論**：利用 Groq 平台的 `llama-3.3-70b-versatile` 模型理解意圖 (如新增、查詢、刪除、修改)。
+4. **呼叫工具**：觸發對應的 Google Calendar API 節點 (Create, Get, Update, Delete)。
+5. **回傳結果**：將執行結果格式化後，經由 LINE API 回傳給用戶。
 
-## 🛠️ 技術架構
-* **自動化工作流**：n8n (自託管 Docker 環境)
-* **LLM 模型**：Groq API (`llama-3.3-70b-versatile`)[cite: 1]
-* **第三方串接**：LINE Messaging API, Google Calendar API (OAuth 2.0)[cite: 4]
-* **內網穿透**：Cloudflare Tunnels (`cloudflared`) 建立對外 Webhook[cite: 4]
+## 🛠️ 技術堆疊
+* **自動化平台**: n8n (Docker 自託管)
+* **LLM 模型**: Groq API (`llama-3.3-70b-versatile`)
+* **API 串接**: LINE Messaging API, Google Calendar API (OAuth 2.0)
+* **內網穿透**: Cloudflare Tunnels (`cloudflared`)
 
 ## ✨ 核心功能
 系統會自動從 LINE 接收訊息，經由 AI Agent 解析語意後執行對應工具：
@@ -24,13 +30,21 @@
 4. **刪除行程**：確認行程 ID 後執行刪除操作[cite: 4]。
 
 ## 🚀 快速啟動
-1. 建立 `docker-compose.yml` 啟動 n8n 容器。
-2. 於 GCP 申請 Google Calendar API 的 OAuth 2.0 憑證，並於 n8n 中綁定[cite: 4]。
-3. 於 LINE Developers 建立官方帳號，獲取 Channel Secret 與 Access Token[cite: 4]。
-4. 匯入 `line_calendar_agent.json`，並將佔位符替換為您的 API Keys。
+1. 使用 `docker-compose.yml` 啟動 n8n 容器。
+2. 於 GCP 申請 Google Calendar API 的 OAuth 2.0 憑證，並於 n8n 中綁定。
+3. 於 LINE Developers 建立官方帳號，獲取 Channel Secret 與 Access Token。
+4. 執行 `cloudflared tunnel --url http://localhost:5678` 建立 Webhook 臨時網址並填入 LINE 後台。
+5. 匯入 `line_calendar_agent_safe.json`，並替換您的 API Keys 與個人信箱。
 
 ##  Author
 **施孟伶 (Meng-Ling Shih)**
 國立臺北科技大學 工業工程與管理研究所 (M.S. in Industrial Engineering and Management, NTUT)
 
 專注於 RAG 架構開發、多輪對話代理人 (Conversational Agents) 與流程自動化部署。
+
+
+
+
+
+
+
