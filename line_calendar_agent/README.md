@@ -4,7 +4,7 @@
 
 ## 🎥 Demo 展示
 [![行事曆助理 Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://youtube.com/shorts/uBPsTAJVkmQ?feature=share)
-*(點擊上方圖片觀看 Demo 影片)*
+*(點擊左側連結觀看 Demo 影片)*
 
 ## 🏗️ 系統架構與工作流
 <img width="945" height="293" alt="Calendar_workflow" src="https://github.com/user-attachments/assets/ba7e1933-1b11-45a3-9203-545bbdf82fe8" />
