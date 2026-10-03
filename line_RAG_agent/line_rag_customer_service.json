@@ -1,0 +1,467 @@
+{
+  "name": "line_calender",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "# System Prompt Overview\nYou are a calendar assistant responsible for managing the user's schedule, including creating, retrieving, updating, and deleting events.\n\n**Calendar Management Tools**  \n   - Use \"Create Event with Attendee\" Use this when the event includes participants.  \n   - Use \"Create Event\" Use this for solo events.   \n   - Use \"Get Events\"  Use this to retrieve calendar schedules when requested.\n   - Use \"Delete Event\" Before deleting an event, first use \"Get Events\" to obtain the event ID.\n   - Use \"Update Event\" Before updating an event, first use \"Get Events\" to obtain the event ID.\n\n**Conflict Handling Mechanism** \nAfter successfully creating an event, the reply message must include both:\n   - A confirmation that the event has been successfully created. Must include Event ID\n   - reminder message \"會議已經建立完成，請務必查詢會議是否有衝突\"\nThe conflict check should be a separate action triggered by the user.\n\n## Final Notes\n   - The current date/time is: [DateTime: 2025-10-16T14:56:28.350+08:00]\n   - If the event duration is not specified, assume it will be one hour by default.\n   - All reply messages must be in Traditional Chinese. Simplified Chinese is strictly prohibited."
+        }
+      },
+      "id": "739ff3f7-8461-413f-8df5-c2d20085a479",
+      "name": "Calendar Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -432,
+        0
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "<YOUR_EMAIL@gmail.com>",
+          "mode": "list",
+          "cachedResultName": "<YOUR_EMAIL@gmail.com>"
+        },
+        "start": "={{ $fromAI(\"eventStart\") }}",
+        "end": "={{ $fromAI(\"eventEnd\") }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $fromAI(\"eventAttendeeEmail\") }}"
+          ],
+          "summary": "={{ $fromAI(\"eventTitle\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        320
+      ],
+      "id": "7ab5ad62-3d84-464a-b6c7-427890c13dac",
+      "name": "Create Event with Attendee",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "7GCCKe5RgjONokhT",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "<YOUR_EMAIL@gmail.com>",
+          "mode": "list",
+          "cachedResultName": "<YOUR_EMAIL@gmail.com>"
+        },
+        "start": "={{ $fromAI(\"eventStart\") }}",
+        "end": "={{ $fromAI(\"eventEnd\") }}",
+        "additionalFields": {
+          "attendees": [],
+          "summary": "={{ $fromAI(\"eventTitle\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        320
+      ],
+      "id": "5dcecd14-204a-40d8-98c3-7739b7665338",
+      "name": "Create Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "7GCCKe5RgjONokhT",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        320
+      ],
+      "id": "659cc339-2762-4304-bdca-ba47ec3b8393",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Ey8zuJxFFtRD9FmF",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <YOUR_LINE_CHANNEL_ACCESS_TOKEN>"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.text.replace(/\\n/g, '\\\\n').replace(/\\\"/g, '\\\\\"') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "8e778e24-3ab6-4b06-9dc8-d6177b601b0f",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "<YOUR_EMAIL@gmail.com>",
+          "mode": "list",
+          "cachedResultName": "<YOUR_EMAIL@gmail.com>"
+        },
+        "timeMin": "={{ $fromAI(\"dayBefore\",\"the day before the date the user requested\") }}",
+        "timeMax": "={{ $fromAI(\"dayAfter\",\"the day after the date the user requested\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        320
+      ],
+      "id": "bc84349d-e813-45c8-b42e-9770b583d7d1",
+      "name": "Get Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "7GCCKe5RgjONokhT",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f0162d5-d825-4ec2-adfd-8eb0ee62d380",
+              "name": "chatInput",
+              "value": "={{ $('LINE-API-Filter').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "3810600e-0311-49a3-939a-a71c0d1a70bb",
+              "name": "process",
+              "value": "=LINE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        32
+      ],
+      "id": "118f5763-6b3e-433d-ac8e-185a4fb251ae",
+      "name": "ProcessFilter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6320f60-3f44-4d6e-b116-be38085964d7",
+              "name": "chatInput",
+              "value": "={{ $json.body.events[0].message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "d4630b70-ef3e-41a6-a74c-c28af4e57bda",
+              "name": "sessionId",
+              "value": "={{ $json.body.events[0].replyToken }}",
+              "type": "string"
+            },
+            {
+              "id": "a2f6ec0a-ff01-420b-bf66-db20025e9588",
+              "name": "replyToken",
+              "value": "={{ $json.body.events[0].replyToken }}",
+              "type": "string"
+            },
+            {
+              "id": "ed2bba82-98ca-49ab-b58e-2b7d141999c3",
+              "name": "$vars.process",
+              "value": "LINE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        112
+      ],
+      "id": "7a80f1ed-5622-46e3-a1a2-2837e150268e",
+      "name": "LINE-API-Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b90c82c4-b063-4663-817b-68d2ec51cfa5",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -864,
+        112
+      ],
+      "id": "35d7e627-ab49-4a48-8565-c31a8708d561",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b951b0b9-8c01-4b78-a4de-7a2b1e56c534",
+              "name": "text",
+              "value": "={{ $json.output.replace(/\\n/g, '\\\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "06a6a561-2339-46fa-b0cd-8d8c11783873",
+              "name": "replyToken",
+              "value": "={{ $('LineWebhook').item.json.body.events[0].replyToken }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "52a0d218-148b-467b-9f5c-edc017ee13ae",
+      "name": "AI-Message-Filter"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "539_robot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6482db07-f025-4ad0-8918-177cb62b5d9c",
+      "name": "LineWebhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1184,
+        112
+      ],
+      "webhookId": "<YOUR_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"ok\"\n}\n",
+        "options": {}
+      },
+      "id": "a5232ac1-f53f-47c2-b8be-89cd68068a27",
+      "name": "Respond to LineWebhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Calendar Agent": {
+      "main": [
+        [
+          {
+            "node": "AI-Message-Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event with Attendee": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to LineWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ProcessFilter": {
+      "main": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LINE-API-Filter": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "ProcessFilter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI-Message-Filter": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LineWebhook": {
+      "main": [
+        [
+          {
+            "node": "LINE-API-Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Taipei",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "630807ae-05dd-432d-ae36-efd0e660a6e5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "472ce6cfb3d67ca9a0a0e6f84dd96f4c97bb9879d582e99e8350d540546f63ef"
+  },
+  "id": "ScB1CQsggRCbHqzP",
+  "tags": []
+}
