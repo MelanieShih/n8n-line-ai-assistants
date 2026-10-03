@@ -17,7 +17,7 @@
 
 ## 🚀 快速啟動
 1. 透過 `docker compose -f docker-compose.with-qdrant.yml up -d` 同時啟動 n8n 與 Qdrant 容器[cite: 3]。
-2. 匯入 `Line客服知識庫_完整版.json`。
+2. 匯入 `line_rag_customer_service.json`。
 3. 設定 HuggingFace Token (用於 Embedding) 與 Groq API Key (用於生成回答)[cite: 3]。
 4. 將 Qdrant 連線 URL 設定為 `http://qdrant:6333`[cite: 3]。
 
