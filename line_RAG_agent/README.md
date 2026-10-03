@@ -4,7 +4,7 @@
 
 ## 🎥 Demo 展示
 [![RAG 客服 Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://youtube.com/shorts/v3r8fZs8Yis?feature=share)
-*(點擊上方圖片觀看 Demo 影片)*
+*(點擊左側連結觀看 Demo 影片)*
 
 ## 🏗️ 系統架構與工作流
 <img width="777" height="275" alt="RAG_workflow" src="https://github.com/user-attachments/assets/14bbd7eb-d507-479e-b3ae-e5a23c6bbf03" />
