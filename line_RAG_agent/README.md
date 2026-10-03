@@ -1,27 +1,43 @@
 # 自動化 AI 客服知識庫系統 (RAG) 🤖
 
-基於 Retrieval-Augmented Generation (RAG) 架構建置的 LINE 智能客服，能針對上傳的專業技術文件（如用電設備規則、台電營業規則）進行精準問答。
+基於 Retrieval-Augmented Generation (RAG) 架構建置的 LINE 智能客服，能針對上傳的專業技術文件（如用電設備規則、台電營業規則）進行精準問答，大幅降低客服人力成本。
 
-## 🛠️ 技術架構
-* **自動化工作流**：n8n (自託管 Docker 環境)[cite: 3]
-* **向量資料庫**：Qdrant (本地部署版)[cite: 3]
-* **嵌入模型 (Embeddings)**：HuggingFace API (`intfloat/multilingual-e5-base`)[cite: 2, 3]
-* **LLM 模型**：Groq API (`qwen/qwen3-32b`)[cite: 2, 3]
-* **文件處理**：Recursive Character Text Splitter (Chunk Overlap: 100)[cite: 2]
+## 🎥 Demo 展示
+[![RAG 客服 Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://youtube.com/shorts/v3r8fZs8Yis?feature=share)
+*(點擊上方圖片觀看 Demo 影片)*
 
-## ✨ 核心功能
-* **自動化向量存儲**：透過 n8n Form Trigger 上傳 PDF 文件，自動切片並轉換為向量儲存至 Qdrant[cite: 2, 3]。
-* **精準文件檢索**：用戶透過 LINE 提問後，系統會從文件庫中檢索最相關的 3 筆資料 (Top-K=3) 進行回答[cite: 2, 3]。
-* **防幻覺機制**：系統提示詞嚴格限制僅能根據檢索內容回答，若無相關資料則統一回覆「文件中未提及」或轉交真人客服[cite: 2]。
-* **記憶功能**：內建 Simple Memory 緩衝區，支援上下文連貫對話[cite: 2]。
+## 🏗️ 系統架構與工作流
+<img width="777" height="275" alt="RAG_workflow" src="https://github.com/user-attachments/assets/14bbd7eb-d507-479e-b3ae-e5a23c6bbf03" />
+
+
+系統運作流程包含兩個獨立環節：
+
+**1. 知識建置 (Knowledge Ingestion)**
+* 透過 n8n 表單上傳 PDF 文件。
+* 使用 Text Splitter 進行切片 (Chunk Overlap: 100)。
+* 經由 HuggingFace 進行向量化 (Embedding)，並存入 Qdrant 向量資料庫。
+
+**2. 檢索問答 (Retrieval & Generation)**
+* 接收 LINE 用戶提問。
+* AI Agent 根據問題，從 Qdrant 檢索出 Top 3 相關內容。
+* 將檢索結果與歷史對話 (Simple Memory) 送入 Groq (`qwen/qwen3-32b`) 生成最終回答。
+* 具備防幻覺機制：若無相關資訊，系統會統一回覆「文件中未提及」或轉交真人客服。
+
+## 🛠️ 技術堆疊
+* **自動化平台**: n8n (Docker)
+* **向量資料庫**: Qdrant (本地容器化部署)
+* **Embedding 模型**: HuggingFace API (`intfloat/multilingual-e5-base`)
+* **LLM 模型**: Groq API (`qwen/qwen3-32b`)
+* **API 串接**: LINE Messaging API
 
 ## 🚀 快速啟動
-1. 透過 `docker compose -f docker-compose.with-qdrant.yml up -d` 同時啟動 n8n 與 Qdrant 容器[cite: 3]。
-2. 匯入 `line_rag_customer_service.json`。
-3. 設定 HuggingFace Token (用於 Embedding) 與 Groq API Key (用於生成回答)[cite: 3]。
-4. 將 Qdrant 連線 URL 設定為 `http://qdrant:6333`[cite: 3]。
+1. 透過 `docker compose -f docker-compose.with-qdrant.yml up -d` 同時啟動 n8n 與 Qdrant 容器。
+2. 匯入 `line_rag_customer_service_safe.json`。
+3. 設定 HuggingFace Token (用於 Embedding) 與 Groq API Key (用於生成回答)。
+4. 將 Qdrant 連線 URL 設定為 `http://qdrant:6333`。
+5. 透過表單上傳技術文件 PDF 建立知識庫，即可在 LINE 上進行對話與問答測試。
 
 ## Author
-**施孟伶 (Meng-Ling Shih)**
+**施孟伶 (Meng-Ling Shih)**  
 國立臺北科技大學 工業工程與管理研究所 (M.S. in Industrial Engineering and Management, NTUT)
-具備精實管理 (Lean Management) 與資料科學分析背景，擅長透過 Python 與 n8n 整合企業 AI 應用解決方案。
+
