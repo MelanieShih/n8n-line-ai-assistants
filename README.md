@@ -1,5 +1,3 @@
-# n8n-line-ai-assistants
-使用 n8n 打造的 LINE 智慧行事曆助理與 RAG 客服知識庫
 # n8n AI Assistants Portfolio 🤖
 
 利用 n8n (Workflow Automation) 結合大型語言模型 (Groq API, HuggingFace) 與第三方服務開發的自動化 AI 助理專案集合。
