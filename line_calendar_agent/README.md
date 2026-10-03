@@ -32,4 +32,5 @@
 ##  Author
 **施孟伶 (Meng-Ling Shih)**
 國立臺北科技大學 工業工程與管理研究所 (M.S. in Industrial Engineering and Management, NTUT)
+
 專注於 RAG 架構開發、多輪對話代理人 (Conversational Agents) 與流程自動化部署。
