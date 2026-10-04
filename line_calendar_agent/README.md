@@ -36,11 +36,7 @@
 4. 執行 `cloudflared tunnel --url http://localhost:5678` 建立 Webhook 臨時網址並填入 LINE 後台。
 5. 匯入 `line_calendar_agent_safe.json`，並替換您的 API Keys 與個人信箱。
 
-##  Author
-**施孟伶 (Meng-Ling Shih)**
-國立臺北科技大學 工業工程與管理研究所 (M.S. in Industrial Engineering and Management, NTUT)
 
-專注於 RAG 架構開發、多輪對話代理人 (Conversational Agents) 與流程自動化部署。
 
 
 
